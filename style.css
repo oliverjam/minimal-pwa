@@ -1,0 +1,12 @@
+body {
+  /* Centre everything */
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* Set font family to preferred system font (San Francisco on Mac/iOS, Roboto
+  on Android, Segoe on Windows etc) */
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+  color: palevioletred;
+  background-color: #222;
+}
