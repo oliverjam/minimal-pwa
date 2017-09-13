@@ -1,5 +1,12 @@
-const CACHE_NAME = 'cache-v1';
-const urlsToCache = ['/', '/style.css'];
+const CACHE_NAME = 'mpwa-cache-v1';
+const urlsToCache = [
+  '/',
+  '/assets/style.css',
+  '/assets/index.js',
+  '/assets/prism.js',
+  '/assets/img/pwa-stats.png',
+  '/assets/img/bing-store.jpg',
+];
 
 // Listen for the install event, which fires when the service worker is installing
 self.addEventListener('install', event => {

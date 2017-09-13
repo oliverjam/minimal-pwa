@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="/assets/style.css">
+  <title>Minimal PWA</title>
+
+  <!-- Favicon/PWA stuff -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#db7093">
+</head>
+<body class="language-javascript">
+  <main class="container">
+  <section class="slide">
+    <h1>Progressive web apps</h1>
+  </section>
+  <section class="slide">
+    <h2>What are PWAs?</h2>
+    <p>Web apps that are progressively enhanced so they feel more 'native' on supporting devices</p>
+  </section>
+  <section class="slide">
+    <h3>Engaging</h3>
+    <p>They should feel at home on a device. They're installable, support push notifications, background sync and an immersive browser-UI-less experience.</p>
+  </section>
+  <section class="slide">
+    <h3>Reliable</h3>
+    <p>They should load content quickly, and should never show the browser's "You're offline" page.</p>
+  </section>
+  <section class="slide">
+    <h3>Fast</h3>
+    <p>They should open immediately. User-interactions should be smooth and navigation instant (just like native apps).</p>
+  </section>
+  <section class="slide">
+    <h2>Why build PWAs?</h2>
+  </section>
+  <section class="slide">
+    <h3>Install prompt</h3>
+    <p>Supporting browsers will automatically prompt the user to install or add to homescreen after certain criteria are met.</p>
+  </section>
+  <section class="slide">
+    <h3>User experience</h3>
+    <p>They offer an incredible user-experience, combining the discoverability and accessibility of the web with the immersive and offline experiences of native apps.</p>
+  </section>
+  <section class="slide slide--image">
+    <img src="/assets/img/pwa-stats.png" alt="Twitter Lite saw a 50% increase in pages per session, 75% in tweets and a 20% decrease in bounce rate">
+  </section>
+  <section class="slide">
+    <h2>Publish everywhere</h2>
+    <p>PWAs work anywhere with a web browser. They progressively improve if the browser supports certain features, eventually becoming almost indistinguishable from native apps.</p>
+  </section>
+  <section class="slide">
+    <h3>Microsoft</h3>
+    <p>Microsoft just announced first-class support for PWAs in Bing and Windows 10. The search engine will automatically index PWAs and add them to the Windows Store. Users won't see any distinction between these and native Windows applications.</p>
+  </section>
+  </section>
+  <section class="slide slide--image">
+    <img src="/assets/img/bing-store.jpg" alt="A screenshot of the Bing search results showing a PWA in the same place as Windows Store apps">
+  </section>
+  <section class="slide">
+    <h3>Android</h3>
+    <p>Google have been evangelising PWAs for a long time. The latest version of Chrome makes the 'Add To Homescreen' process look almost identical to the native Android app installation.</p>
+<p>It also puts the app into the app drawer with all the native apps, rather than on the homescreen. PWAs will soon have access to many of Androids native APIs too.</p>
+  </section>
+  <section class="slide">
+    <h3>Samsung</h3>
+    <p>Samsung Internet on Android now fully supports PWAs. They're indicated in the URL bar — the usual button to bookmark the site (a star) gets dynamically replaced by a new + icon.</p>
+  </section>
+  <section class="slide">
+    <h3>Samsung</h3>
+    <div class="slide__embed">
+      <iframe src="https://www.youtube.com/embed/maYqioxJ2TM" frameborder="0" allowfullscreen></iframe>
+    </div>
+  </section>
+  <section class="slide">
+    <h3>iOS (finally!)</h3>
+    <p>Apple began implementing the required APIs (like service workers) in Webkit this month. Up until now proper PWAs weren't really possible on iOS as couldn't work offline or use push notifications.</p>
+    <p>We still don't know exactly what Apple plan to do with them, but PWAs should work properly on iOS very soon.</p>
+  </section>
+  <section class="slide">
+    <h2>Caveats</h2>
+    <p>The new browser APIs are very powerful. To ensure they're used for good PWAs must be served over HTTPS.</p>
+  </section>
+  <section class="slide">
+    <h2>How do we build them?</h2>
+    <p>New browser APIs give our web apps superpowers:</p>
+      <ul>
+        <li>Service workers</li>
+        <li>Cache API</li>
+        <li>Push API</li>
+        <li>Background Sync API</li>
+      </ul>
+  </section>
+  <section class="slide">
+    <h3>Service worker</h3>
+    <p>A service worker is effectively a server that lives in the browser. This is what serves files locally when the browser has no network connection.</p>
+<p>It can run even when the browser tab isn't open, which enables features like push notifications and background data syncing.</p>
+  </section>
+  <section class="slide">
+    <h3>Webapp manifest</h3>
+    <p>The manifest.json file allows us to tell browsers how to display our PWA. We can set brand colours, icons and configure how much browser UI gets shown.</p>
+<pre><code>{
+  "short_name": "PWA",
+  "name": "My nice PWA",
+  "icons": [
+    {
+      "src": "icon.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    }
+  ],
+  "start_url": "index.html",
+  "display": "standalone",
+  "theme_color": "blue"
+  "background_color": "red"
+}</code>
+</pre>
+  </section>
+  <section class="slide">
+    <h3>Registering a service worker</h3>
+    <p>The service-worker needs to be registered before it can activate on a page.</p>
+<pre><code>if ('serviceWorker' in navigator) {
+  navigator.serviceWorker
+    .register('/service-worker.js')
+    .then(() => {
+      console.log('Service worker registered');
+    })
+    .catch(err => {
+      console.log('Service worker registration failed: ' + err);
+    });
+}</code>
+</pre>
+  </section>
+  <section class="slide">
+    <h3>Caching initial files</h3>
+    <p>To allow your PWA to work offline you need to cache the static HTML, CSS and JS files when the page loads for the first time.</p>
+<pre><code>self.addEventListener('install', function(event) {
+  event.waitUntil(
+    caches.open('myCache-v1').then(function(cache) {
+      return cache.addAll([
+        'index.html',
+        'style.css',
+        'app.js',
+      ]);
+    })
+  );
+});</code>
+</pre>
+  </section>
+  <section class="slide">
+    <h3>Serving files from the cache</h3>
+    <p>A service worker can intercept network requests, responding instead of the actual remote server.</p>
+<pre><code>self.addEventListener('fetch', function(event) {
+  event.respondWith(
+    caches.match(event.request).then(response => {
+      return response || fetch(event.request);
+    })
+  );
+})</code>
+</pre>
+  </section>
+  <section class="slide">
+    <h3>Generating service workers</h3>
+    <p>SW-Precache is a great simple library from Google that will automatically generate your service worker for you. You configure it with a JS file, then run it from the command line (or in a build script).</p>
+<pre><code>module.exports = {
+  stripPrefix: 'build/',
+  staticFileGlobs: [
+    'build/*.html',
+    'build/*.css',
+    'build/*.js',
+  ],
+  swFilePath: 'build/service-worker.js',
+};</code></pre>
+<pre><code>$ sw-precache --config=sw-precache-config.js</code></pre>
+  </section>
+  <section class="slide">
+    <h3>Generating service workers</h3>
+    <p>SW-Precache also lets you easily configure runtime-caching of external resources.</p>
+<pre><code>module.exports = {
+  ...
+  runtimeCaching: [{
+    urlPattern: /^https:\/\/example\.com\/api/,
+    handler: 'networkFirst'
+  }, {
+    urlPattern: /\/articles\//,
+    handler: 'fastest',
+    options: {
+      cache: {
+        maxEntries: 10,
+        name: 'articles-cache'
+      }
+    }
+  }]
+};
+</code></pre>
+<pre><code>$ sw-precache --config=sw-precache-config.js</code></pre>
+  </section>
+  <section class="slide">
+    <h3>Generating service workers</h3>
+    <p>There is also a new Google library called Workbox, which integrates with most build tools and has built in modules for lots of common PWA patterns</p>
+  </section>
+  <section class="slide">
+    <h3>JS framework support</h3>
+    <p>Create React App, Preact CLI and Vue Templates all create performant PWAs by default now. This includes a service worker that caches the initial files.</p>
+    <p>Addy Osmani's talk from Google I/O:<br><a href="https://youtube.com/watch?v=aCMbSyngXB4">youtube.com/watch?v=aCMbSyngXB4</a></p>
+  </section>
+  <section class="slide">
+    <h3>User expectations</h3>
+    <p>It's worth considering that users will likely not have encountered this paradigm before.</p>
+<p>Websites don't usually install themselves to the phone and work offline. It's best to notify them when unusual things happen (like offline availability).</p>
+  </section>
+  <section class="slide">
+    <h2>Example code</h2>
+    <p><a href="https://github.com/oliverjam/minimal-pwa">github.com/oliverjam/minimal-pwa</a></p>
+  </section>
+  <section class="slide">
+    <h2>Resources</h2>
+    <ul>
+      <li><a href="https://developers.google.com/web/progressive-web-apps">developers.google.com/web/progressive-web-apps</a></li>
+      <li><a href="https://cloudfour.com/thinks/progressive-web-apps-simply-make-sense">cloudfour.com/thinks/progressive-web-apps-simply-make-sense</a></li>
+      <li><a href="https://serviceworke.rs">serviceworke.rs</a></li>
+    </ul>
+  </section>
+</main>
+<nav class="nav">
+  <button class="nav__button" data-direction="37" disabled>
+    <svg class="icon" viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+          <path d="M20 30 L8 16 20 2"></path>
+      </svg>
+  </button>
+  <button class="nav__button" data-direction="39" disabled>
+    <svg class="icon" viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+          <path d="M12 30 L24 16 12 2"></path>
+      </svg>
+  </button>
+</nav>
+  <script src='/assets/index.js'></script>
+  <script src='/assets/prism.js'></script>
+  <script>
+  // Check to make sure the browser supports service workers
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker
+    .register('/service-worker.js')
+    .then(() => {
+      console.log('Service worker registered');
+    })
+    .catch(err => {
+      console.log('Service worker registration failed: ' + err);
+    });
+}
+</script>
+</body>
+</html>
