@@ -1,0 +1,299 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
+    Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+  font-size: calc(0.8em + 1.25vw);
+  line-height: 1.3;
+  color: #333;
+  background-color: #fbfaf9;
+}
+
+a {
+  color: palevioletred;
+  text-decoration-skip: ink;
+}
+
+h1 {
+  text-align: center;
+}
+
+h1,
+h2 {
+  line-height: 1;
+  color: #444;
+}
+
+p {
+  margin-top: 1em;
+  max-width: 50rem;
+}
+
+img {
+  margin-left: 1em;
+}
+
+ul {
+  margin-top: 1em;
+  padding-left: 1em;
+}
+
+pre {
+  margin-top: 1em;
+  padding: 1em;
+  max-width: 20rem;
+  font-size: 0.8rem;
+  color: #fbfaf9;
+  background-color: #444;
+  border-radius: 2px;
+}
+
+@media (min-width: 40em) {
+  pre {
+    font-size: 1.125rem;
+    max-width: 50rem;
+  }
+}
+
+.container {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.slide {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  padding: 2em 2em;
+  -webkit-box-flex: 1;
+  -ms-flex: 1 0 100%;
+  flex: 1 0 100%;
+  border: 1em solid tomato;
+}
+@media (min-width: 40em) {
+  .slide {
+    padding: 2em 4em;
+  }
+}
+.slide:nth-child(2n) {
+  border-color: skyblue;
+}
+.slide:first-child {
+  border-color: palevioletred;
+}
+.slide--image {
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+.slide--image > .slide__content {
+  -ms-flex-preferred-size: 60%;
+  flex-basis: 60%;
+}
+.slide--image > .slide__content > p {
+  max-width: 100%;
+}
+.slide__embed {
+  margin-top: 1em;
+  position: relative;
+  width: calc(100vw * 0.66);
+  height: calc(56.25vw * 0.66);
+}
+.slide__embed > iframe {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.nav {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+  padding: 2em;
+}
+.nav__button {
+  padding: 0.5em;
+  color: #666;
+  background: none;
+  border: none;
+}
+.nav__button:disabled {
+  display: none;
+}
+.nav__button:focus {
+  outline: none;
+}
+
+.icon {
+  vertical-align: middle;
+}
+
+/* http://prismjs.com/download.html?themes=prism&languages=clike+javascript */
+/**
+ * prism.js default theme for JavaScript, CSS and HTML
+ * Based on dabblet (http://dabblet.com)
+ * @author Lea Verou
+ */
+
+code[class*='language-'],
+pre[class*='language-'] {
+  color: black;
+  background: none;
+  text-shadow: 0 1px white;
+  font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  word-wrap: normal;
+  line-height: 1.5;
+
+  -moz-tab-size: 2;
+  -o-tab-size: 2;
+  tab-size: 2;
+
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
+}
+
+pre[class*='language-']::-moz-selection,
+pre[class*='language-'] ::-moz-selection,
+code[class*='language-']::-moz-selection,
+code[class*='language-'] ::-moz-selection {
+  text-shadow: none;
+  background: #b3d4fc;
+}
+
+pre[class*='language-']::selection,
+pre[class*='language-'] ::selection,
+code[class*='language-']::selection,
+code[class*='language-'] ::selection {
+  text-shadow: none;
+  background: #b3d4fc;
+}
+
+@media print {
+  code[class*='language-'],
+  pre[class*='language-'] {
+    text-shadow: none;
+  }
+}
+
+/* Code blocks */
+pre[class*='language-'] {
+  overflow: auto;
+}
+
+:not(pre) > code[class*='language-'],
+pre[class*='language-'] {
+  background: #f5f2f0;
+}
+
+/* Inline code */
+:not(pre) > code[class*='language-'] {
+  padding: 0.1em;
+  border-radius: 0.3em;
+  white-space: normal;
+}
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: slategray;
+}
+
+.token.punctuation {
+  color: #999;
+}
+
+.namespace {
+  opacity: 0.7;
+}
+
+.token.property,
+.token.tag,
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol,
+.token.deleted {
+  color: #905;
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted {
+  color: #690;
+}
+
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string {
+  color: #a67f59;
+  background: hsla(0, 0%, 100%, 0.5);
+}
+
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+  color: #07a;
+}
+
+.token.function {
+  color: #dd4a68;
+}
+
+.token.regex,
+.token.important,
+.token.variable {
+  color: #e90;
+}
+
+.token.important,
+.token.bold {
+  font-weight: bold;
+}
+.token.italic {
+  font-style: italic;
+}
+
+.token.entity {
+  cursor: help;
+}
