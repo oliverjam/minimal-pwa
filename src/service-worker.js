@@ -1,74 +1,80 @@
-const CACHE_NAME = 'mpwa-cache-v1';
+/**
+ * The cache name should change every time you want to "cache bust"
+ * i.e. if you want to change these files
+ * in a real-world app this would be handled by your build system
+ * e.g. Vite or Next.js would hash the files so the name is unique based on content
+ * (style-XYZ123.css etc)
+ */
+const CACHE_NAME = "mpwa-cache-v1";
 const urlsToCache = [
-  '/',
-  '/assets/style.css',
-  '/assets/index.js',
-  '/assets/prism.js',
-  '/assets/img/pwa-stats.png',
-  '/assets/img/bing-store.jpg',
+  "/",
+  "/assets/style.css",
+  "/assets/index.js",
+  "/assets/prism.js",
+  "/assets/img/pwa-stats.png",
+  "/assets/img/bing-store.jpg",
 ];
 
-// Listen for the install event, which fires when the service worker is installing
-self.addEventListener('install', event => {
-  // Ensures the install event doesn't complete until after the cache promise resolves
-  // This is so we don't move on to other events until the critical initial cache is done
-  event.waitUntil(
-    // Open a named cache, then add all the specified URLs to it
-    caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))
-  );
+/**
+ * Listen for the install event, which fires when the service worker is installing.
+ * We use event.waitUntil() to ensure the install doesn't finished until our promise resolves
+ * so we don't do anything else until the initial caching is done.
+ */
+self.addEventListener("install", async (event) => {
+  console.log("installing!");
+  self.skipWaiting();
+  event.waitUntil(cache_assets());
 });
 
-// Listen for the activate event, which is fired after installation
-// Activate is when the service worker actually takes over from the previous
-// version, which is a good time to clean up old caches
-self.addEventListener('activate', event => {
-  console.log('Finally active. Ready to serve!');
-  event.waitUntil(
-    // Get the keys of all the old caches
-    caches
-      .keys()
-      // Ensure we don't resolve until all the promises do (i.e. each key has been deleted)
-      .then(keys =>
-        Promise.all(
-          keys
-            // Remove any cache that matches the current cache name
-            .filter(key => key !== CACHE_NAME)
-            // Map over the array of old cache names and delete them all
-            .map(key => caches.delete(key))
-        )
-      )
-  );
+async function cache_assets() {
+  const cache = await self.caches.open(CACHE_NAME);
+  return cache.addAll(urlsToCache);
+}
+
+/**
+ * Listen for the activate event, which is fired after installation
+ * Activate is when the service worker actually takes over from the previous
+ * version, which is a good time to clean up old caches.
+ * Again we use waitUntil() to ensure we don't move on until the old caches are deleted.
+ */
+self.addEventListener("activate", async (event) => {
+  console.log("activating!");
+  event.waitUntil(delete_old_caches());
 });
 
-// Listen for browser fetch events. These fire any time the browser tries to load
-// any outside resources
-self.addEventListener('fetch', function(event) {
-  // This lets us control the response
-  // We pass in a promise that resolves with a response object
-  event.respondWith(
-    // Check whether we have a matching response for this request in our cache
-    caches.match(event.request).then(response => {
-      // It's in the cache! Serve the response straight from there
-      if (response) {
-        console.log('Serving response from the cache');
-        return response;
-      }
-      // If it's not in the cache we make a fetch request for the resource
-      return (
-        fetch(event.request)
-          // Then we open our cache
-          .then(response => caches.open(CACHE_NAME))
-          // Then we put the request into the cache, so we have it offline next time
-          .then(cache => {
-            // We have to clone the response as response streams can only be read once
-            // This way we can put one copy in the cache and return the other to the browser
-            cache.put(event.request, response.clone());
-            return response;
-          })
-          .catch(response => {
-            console.log('Fetch failed, sorry.');
-          })
-      );
-    })
-  );
+async function delete_old_caches() {
+  // Get the keys of all the old caches
+  const keys = await caches.keys();
+  const deletePromises = keys
+    .filter((key) => key !== CACHE_NAME)
+    .map((key) => self.caches.delete(key));
+  return Promise.all(deletePromises);
+}
+
+/**
+ * Listen for browser fetch events.
+ * These fire any time the browser tries to load anything.
+ * This isn't just fetch() calls; clicking a <a href> triggers it too.
+ */
+self.addEventListener("fetch", (event) => {
+  console.log("fetching!");
+  event.respondWith(get_response(event.request));
 });
+
+/**
+ * We follow the "stale-while-revalidate" pattern:
+ * respond with the cached response immediately (if we have one)
+ * even though this might be "stale" (not the most recent version).
+ * In the background fetch the latest version and put that into cache
+ * on next request the user will get the latest version
+ */
+async function get_response(request) {
+  const cache = await self.caches.open(CACHE_NAME);
+  const cached_response = await cache.match(request);
+  // Important: we do not await here, since that would defeat the point of using the cache
+  const pending_response = fetch(request).then((response) => {
+    cache.put(request, response.clone());
+    return response;
+  });
+  return cached_response || pending_response;
+}
